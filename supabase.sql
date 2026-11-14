@@ -4,7 +4,7 @@ create table public.dishes (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 1 and 40),
   item text not null check (char_length(item) between 1 and 80),
-  category text not null check (category in ('mains', 'sides', 'desserts', 'drinks', 'supplies', 'other')),
+  category text not null check (category in ('mains', 'sides', 'desserts', 'drinks', 'supplies', 'other', 'tree')),
   note text check (note is null or char_length(note) <= 140),
   created_at timestamptz not null default now()
 );

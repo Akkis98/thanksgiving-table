@@ -4,6 +4,14 @@ A one-page sign-up for what everyone is bringing to Thanksgiving. Each entry lan
 
 It is a single `index.html` served by GitHub Pages. The shared list lives in a free Supabase database.
 
+## How the page is laid out
+
+- **The invitation.** First-time guests land on the family portrait (`montage.html`) with one button, "Enter the feast". Returning guests skip it; the Invitation button in the header brings it back.
+- **The Feast** and **The Tree.** Two tabs for the two halves of the evening. Each has a scene (the table, the tree), a list by guest, and one button to add something. Tapping any entry lets you edit or remove it.
+- **Design tokens.** Colors, fonts, spacing, radii and shadows are defined once at the top of the `<style>` block in `index.html`. The tree tab only swaps the accent color.
+
+The database only allows adding and removing rows, so an edit saves the new version and then removes the old one.
+
 ## Connect the database (one time, about five minutes)
 
 1. Go to https://supabase.com, sign up, and create a new project (the free plan is enough).
@@ -15,7 +23,7 @@ Until step 4 is done the page runs in preview mode and saves entries only on the
 
 ## Sound and link preview
 
-The music and sound effects are generated in the page, so there are no audio files. `og.png` is the picture shown when the link is shared.
+The music and sound effects are generated in the page, so there are no audio files. Nothing plays until a guest presses Music. `og.png` is the picture shown when the link is shared.
 
 ## Change the details
 

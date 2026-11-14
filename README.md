@@ -12,7 +12,11 @@ It is a single `index.html` served by GitHub Pages. The shared list lives in a f
 
 The database only allows adding and removing rows, so an edit saves the new version and then removes the old one.
 
-## Connect the database (one time, about five minutes)
+## The database
+
+The page is connected to a Supabase project named `thanksgiving-table` (the URL and publishable key are near the top of the script in `index.html`). The steps below are only needed to point it at a different project.
+
+## Connect a database (one time, about five minutes)
 
 1. Go to https://supabase.com, sign up, and create a new project (the free plan is enough).
 2. Open **SQL Editor**, paste everything in `supabase.sql`, and press **Run**.

@@ -139,7 +139,7 @@
   }
   .art-canvas { position: relative; }
   .art-canvas img { display: block; width: 100%; height: 100%; }
-  .art-canvas iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
+  .art-canvas iframe, .art-canvas video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; object-fit: cover; }
   .art-canvas iframe:not([src]) { display: none; }
   .swipe-hint { display: flex; align-items: center; justify-content: center; min-height: 36px; font-size: 13px; color: var(--ink-soft); }
   .art:not(.pans) .swipe-hint { display: none; }
@@ -1326,15 +1326,27 @@ $("down").addEventListener("click", e => {
 $("show-invite").addEventListener("click", () => glide(0));
 addEventListener("resize", centerArt);
 centerArt();
-// Phones and tablets get the portrait as a plain picture. The animated version is a large live
-// scene that can run a phone's browser out of memory when you pinch to zoom, so it only loads
-// on computers (mouse or trackpad).
+// Computers get the live animated portrait. Phones and tablets get the same animation as a short
+// looping video laid over the still picture: the live version is a large scene that can run a
+// phone's browser out of memory when you pinch to zoom, and a video doesn't have that problem.
+let portraitVideo = null;
 if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
   const frame = document.querySelector(".art-canvas iframe");
   frame.src = frame.dataset.src;
+} else if (!calm) {
+  const v = portraitVideo = document.createElement("video");
+  v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true; v.preload = "auto";
+  v.setAttribute("muted", ""); v.setAttribute("playsinline", ""); v.setAttribute("aria-hidden", "true");
+  v.disablePictureInPicture = true; v.disableRemotePlayback = true;
+  v.poster = "portrait.jpg"; v.src = "portrait.mp4";
+  document.querySelector(".art-canvas").append(v);
+  v.play().catch(() => {});     // if the phone refuses (Low Power Mode), the still picture stays
 }
 // The pinned "Bring a dish" button stays out of the way while the invitation fills the screen.
-new IntersectionObserver(([e]) => document.documentElement.classList.toggle("at-invite", e.intersectionRatio > 0.35),
+new IntersectionObserver(([e]) => {
+  document.documentElement.classList.toggle("at-invite", e.intersectionRatio > 0.35);
+  if (portraitVideo) { if (e.isIntersecting) portraitVideo.play().catch(() => {}); else portraitVideo.pause(); }
+},
   { threshold: [0, 0.35, 1] }).observe($("welcome"));
 
 /* ---------- add / edit form ---------- */

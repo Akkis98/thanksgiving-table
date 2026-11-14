@@ -25,6 +25,10 @@ The page is connected to a Supabase project named `thanksgiving-table` (the URL 
 
 Until step 4 is done the page runs in preview mode and saves entries only on the device that typed them.
 
+## The portrait on phones
+
+Computers show `montage.html` live. Phones and tablets show `portrait.jpg` with `portrait.mp4` (a 12-second looping recording of the same animation) playing over it, because the live scene could crash a phone's browser on pinch-zoom. If you change `montage.html`, both files need re-rendering.
+
 ## Sound and link preview
 
 The music and sound effects are generated in the page, so there are no audio files. Music is on by default and starts as soon as the browser allows it (usually the guest's first tap); the Music button turns it off, and that choice is remembered. `og.png` is the picture shown when the link is shared.

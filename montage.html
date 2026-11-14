@@ -1,0 +1,322 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>The Last Supper (Until Leftovers)</title>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Caveat:wght@700&family=Cinzel:wght@600;900&family=Bangers&family=Nunito:wght@800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#1b120a}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+#stage{position:relative;width:2400px;height:1200px;overflow:hidden;font-family:Nunito,sans-serif}
+#stage>*{position:absolute}
+#room{inset:0;width:2400px;height:1200px}
+.char{position:absolute;transform-origin:50% 88%}
+.live .char{animation:bob var(--t) ease-in-out var(--d) infinite alternate}
+@keyframes bob{to{transform:translateY(-7px) rotate(1.6deg)}}
+.live .eyes{animation:blink 4.2s var(--d) infinite;transform-box:fill-box;transform-origin:center}
+@keyframes blink{0%,91%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+.live .tongue{animation:pant .28s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:top center}
+@keyframes pant{to{transform:scaleY(1.35)}}
+.live .ear{animation:ear 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:80% 20%}
+@keyframes ear{0%,80%,100%{transform:none}88%{transform:rotate(-16deg)}}
+.live .arm{animation:cheers var(--t) ease-in-out var(--d) infinite alternate;transform-origin:196px 236px}
+.live .arm-l{transform-origin:44px 236px;animation-name:wave}
+@keyframes wave{to{transform:rotate(9deg)}}
+@keyframes cheers{to{transform:rotate(-9deg)}}
+.live .talk{animation:talk .32s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}
+@keyframes talk{to{transform:scaleY(.35)}}
+.live .chat{animation:chat 1.6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:20% 100%}
+@keyframes chat{from{transform:scale(.86)}}
+.live .food{animation:hop 1.8s ease-in-out infinite alternate}
+@keyframes hop{to{margin-top:-5px}}
+.live .bulb{animation:tw 1.3s ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.35}}
+.live .bubble{animation:pop 3s ease-in-out infinite alternate}
+@keyframes pop{to{transform:rotate(-2deg) scale(1.04)}}
+.name{display:block;top:876px;background:#fffaf0;color:#3a2413;font-family:Caveat;font-size:34px;padding:0 14px 2px;border-radius:5px;box-shadow:0 4px 8px rgba(0,0,0,.4);border:2px solid #2b1a10}
+#portrait{position:absolute;left:1010px;top:120px;width:380px;height:300px;background:#7a2a2a;border:16px solid #d9a93a;box-shadow:0 12px 30px rgba(0,0,0,.6),inset 0 0 0 4px #7a5210;overflow:hidden}
+#portrait b{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(#e8c96b,#b98d2b);color:#2e1d05;font:900 24px Cinzel,serif;letter-spacing:.2em;text-align:center;padding:3px 0}
+#people,#arms,#halos,#giant,#food,#front,#names,#bubbles{inset:0}
+
+#table{left:24px;right:24px;top:760px;height:250px;border-radius:6px}
+#table::after{content:"";position:absolute;left:0;right:0;top:0;height:84px;background:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.12));border-bottom:4px solid rgba(0,0,0,.16);border-radius:6px 6px 0 0}
+.food{position:absolute;line-height:1;transform:translate(-50%,-100%)}
+.halo{position:absolute;border-radius:50%;transform:translate(-50%,-50%);display:none}
+.name{position:absolute;transform:translate(-50%,0);white-space:nowrap}
+.bubble{position:absolute;display:none}
+#title,#sub,#credits,#plaque,#ribbon,#tag{display:none;text-align:center}
+#grain,#vig,#frame,#spot,#dots,#lights{inset:0;pointer-events:none;display:none}
+
+/* ============ 1. FRESCO ============ */
+.v1 .ceil{fill:#8c7f6b}.v1 .back{fill:#b9ab90}.v1 .side{fill:#74674f}.v1 .floor{fill:#6d5b45}.v1 .panel{fill:#4a3d2e}.v1 .win{fill:url(#sky1)}.v1 .beam{stroke:#5d5140}
+.v1 #table{background:linear-gradient(#f3ecdb,#ddd2b8 60%,#bfb293);box-shadow:0 30px 40px rgba(0,0,0,.45)}
+.v1 #table::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 196px,rgba(90,70,40,.18) 196px 199px),linear-gradient(transparent 104px,rgba(60,80,120,.35) 104px 110px,transparent 110px 120px,rgba(60,80,120,.25) 120px 123px,transparent 123px)}
+.v1 #people,.v1 #arms{filter:sepia(.42) saturate(.8) contrast(.98)}
+.v1 .food,.v1 .name{filter:sepia(.45) saturate(.8)}
+.v1 #grain,.v1 #vig,.v1 #frame,.v1 #plaque{display:block}
+.v1 #stage-tone{display:block}
+#grain{opacity:.8;mix-blend-mode:multiply;background:url(grain.png)}
+#vig{background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(40,25,10,.55) 100%)}
+#frame{border:38px solid;border-image:linear-gradient(135deg,#f6d77a,#8a5f14 30%,#f1cf6a 50%,#7a5210 75%,#f6d77a) 1;box-shadow:inset 0 0 0 6px #3b2606,inset 0 0 60px rgba(0,0,0,.6)}
+#plaque{left:50%;bottom:52px;transform:translateX(-50%);background:linear-gradient(#e8c96b,#b98d2b);color:#2e1d05;padding:12px 44px 14px;border-radius:6px;box-shadow:0 6px 14px rgba(0,0,0,.6),inset 0 0 0 3px #7a5210;font-family:Cinzel,serif}
+#plaque b{display:block;font-size:40px;font-weight:900;letter-spacing:.04em}#plaque i{font-family:"Playfair Display",serif;font-size:26px}
+
+/* ============ 2. HOLY HALOS ============ */
+.v2 .ceil{fill:#0d3b46}.v2 .back{fill:#125666}.v2 .side{fill:#0a2e37}.v2 .floor{fill:#3a1d12}.v2 .panel{fill:#8f1d2c}.v2 .win{fill:url(#sky2)}.v2 .beam{stroke:#f4c95d;stroke-opacity:.5}
+.v2 #rays{display:block}
+.v2 #table{background:linear-gradient(#fffaf0,#f1dfbb);box-shadow:0 30px 40px rgba(0,0,0,.5);border-top:10px solid #c2212f}
+.v2 .halo{display:block;width:210px;height:210px;background:radial-gradient(circle,#fff6c2 0 52%,#ffd84d 53% 78%,#b8860b 79% 84%,#ffe98a 85% 100%);box-shadow:0 0 50px 14px rgba(255,216,77,.6)}
+.v2 .char{filter:drop-shadow(0 6px 8px rgba(0,0,0,.35))}
+.v2 #ribbon{display:block;left:50%;top:26px;transform:translateX(-50%);background:#c2212f;color:#fff7e6;font-family:"Bagel Fat One";font-size:54px;padding:10px 60px 14px;border-radius:14px;box-shadow:0 8px 0 #74161b,0 16px 30px rgba(0,0,0,.5)}
+.v2 #tag{display:block;left:50%;bottom:46px;transform:translateX(-50%);font-family:Caveat;font-size:64px;color:#ffe98a;text-shadow:0 4px 0 #000}
+
+/* ============ 3. MOVIE POSTER ============ */
+.v3 .ceil,.v3 .back,.v3 .side,.v3 .floor{fill:#07080c}.v3 .panel{fill:#0d0f16}.v3 .win{fill:#10131c}.v3 .beam{stroke:#151824}
+.v3 #table{background:linear-gradient(#d8d2c4,#8d8573 55%,#2a2620);box-shadow:0 40px 60px #000}
+.v3 .char{filter:brightness(.86) contrast(1.08) saturate(.85)}
+.v3 .name{display:none}
+.v3 #spot{display:block;background:radial-gradient(ellipse 60% 55% at 50% 48%,rgba(255,196,110,.34),transparent 70%),radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(0,0,0,.9) 100%)}
+.v3 #title{display:block;left:0;right:0;top:80px;font-family:Cinzel,serif;font-weight:900;font-size:160px;letter-spacing:.1em;line-height:1;color:#f3d28a;text-shadow:0 0 50px rgba(243,166,60,.7)}
+.v3 #sub{display:block;left:0;right:0;top:34px;font-family:Cinzel,serif;font-size:36px;letter-spacing:.5em;color:#d9d3c5}
+.v3 #tag{display:block;left:0;right:0;top:250px;font-family:"Playfair Display",serif;font-style:italic;font-size:46px;color:#fff}
+.v3 #credits{display:block;left:120px;right:120px;bottom:40px;font-family:Cinzel,serif;font-size:27px;letter-spacing:.14em;line-height:1.5;color:#b9b2a2}
+.v3 #credits b{color:#f3d28a;font-size:34px}
+
+/* ============ 4. COMIC POP ============ */
+.v4 .ceil{fill:#ffd23f}.v4 .back{fill:#ff6b9d}.v4 .side{fill:#3ec1d3}.v4 .floor{fill:#7b2ff7}.v4 .panel{fill:#ffd23f}.v4 .win{fill:#fff}.v4 .beam{stroke:#000;stroke-width:6}
+.v4 #room *{stroke:#000;stroke-width:6}
+.v4 #dots{display:block;background:radial-gradient(circle,rgba(0,0,0,.22) 0 3px,transparent 3.5px) 0 0/16px 16px}
+.v4 #table{background:#fff;border:8px solid #000;box-shadow:14px 14px 0 #000}
+.v4 #table::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,#ff3b3b 0 60px,#fff 60px 120px);opacity:.9;clip-path:inset(88px 0 0 0)}
+.v4 .char{filter:saturate(1.25) drop-shadow(5px 0 0 #fff) drop-shadow(-5px 0 0 #fff) drop-shadow(0 -5px 0 #fff)}
+.v4 .name{font-family:Bangers;font-size:30px;border-width:4px;box-shadow:5px 5px 0 #000;top:872px}
+.v4 .bubble{display:block;background:#fff;border:6px solid #000;border-radius:44px;padding:12px 26px;font-family:Bangers;font-size:46px;letter-spacing:.03em;box-shadow:8px 8px 0 #000;white-space:nowrap}
+.v4 .bubble::after{content:"";position:absolute;bottom:-34px;left:var(--tail,40%);border:18px solid transparent;border-top:34px solid #000;border-bottom:0}
+.v4 .bubble.dog::after{bottom:auto;top:-34px;border-top:0;border-bottom:34px solid #000}
+.v4 #ribbon{display:block;left:50%;bottom:22px;transform:translateX(-50%) rotate(-2deg);background:#ffd23f;border:8px solid #000;box-shadow:10px 10px 0 #000;font-family:Bangers;font-size:84px;padding:0 44px;letter-spacing:.04em;white-space:nowrap}
+
+/* ============ 5. THE HOST IS WATCHING ============ */
+.v5 .ceil{fill:#2a1a12}.v5 .back{fill:#5b3a26}.v5 .side{fill:#3a2418}.v5 .floor{fill:#24150d}.v5 .panel{fill:#2a1a12}.v5 .win{fill:url(#sky5)}.v5 .beam{stroke:#1b100a}
+.v5 #table{background:linear-gradient(#fbf0dc,#e8d3aa);box-shadow:0 30px 50px rgba(0,0,0,.6);border-top:12px solid #c2622b}
+.v5 #lights{display:block}
+.v5 .char{filter:drop-shadow(0 8px 12px rgba(0,0,0,.45))}
+.v5 #spot{display:block;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(255,190,110,.22),transparent 70%),radial-gradient(ellipse at 50% 50%,transparent 50%,rgba(0,0,0,.6) 100%)}
+.v5 #ribbon{display:block;left:70px;top:60px;text-align:left;font-family:"Bagel Fat One";font-size:96px;line-height:.95;color:#fff7e6;text-shadow:0 6px 0 #74161b,0 14px 24px rgba(0,0,0,.6);transform:rotate(-3deg)}
+.v5 #tag{display:block;right:80px;top:90px;text-align:right;font-family:Caveat;font-size:70px;line-height:1;color:#ffd166;text-shadow:0 4px 0 #000;transform:rotate(3deg)}
+</style></head><body>
+<div id="stage">
+<svg id="room" viewBox="0 0 2400 1200">
+  <defs>
+    <linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9cfd6"/><stop offset=".6" stop-color="#e9e2c3"/><stop offset=".61" stop-color="#8a9a72"/><stop offset="1" stop-color="#6c7c58"/></linearGradient>
+    <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset=".65" stop-color="#ff6b6b"/><stop offset=".66" stop-color="#5b2a86"/><stop offset="1" stop-color="#2d1457"/></linearGradient>
+    <linearGradient id="sky5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1437"/><stop offset="1" stop-color="#31406f"/></linearGradient>
+    <filter id="paint"><feGaussianBlur stdDeviation="1.1"/><feComponentTransfer><feFuncR type="discrete" tableValues="0 .1 .2 .3 .4 .5 .6 .7 .8 .9 1"/><feFuncG type="discrete" tableValues="0 .1 .2 .3 .4 .5 .6 .7 .8 .9 1"/><feFuncB type="discrete" tableValues="0 .1 .2 .3 .4 .5 .6 .7 .8 .9 1"/></feComponentTransfer><feGaussianBlur stdDeviation=".7"/></filter>
+    <filter id="poster"><feGaussianBlur stdDeviation="1.4"/><feComponentTransfer><feFuncR type="discrete" tableValues="0 .22 .45 .7 .9 1"/><feFuncG type="discrete" tableValues="0 .22 .45 .7 .9 1"/><feFuncB type="discrete" tableValues="0 .22 .45 .7 .9 1"/></feComponentTransfer></filter>
+    <filter id="grainf" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="4" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 .5  0 0 0 0 .45  0 0 0 0 .38  0 0 0 .55 0" result="g"/></filter>
+  </defs>
+  <polygon class="ceil" points="0,0 2400,0 1820,150 580,150"/>
+  <g class="beam" stroke-width="4" fill="none"><path d="M193,50 H2207 M387,100 H2013"/><path d="M400,0 L870,150 M800,0 L1035,150 M1200,0 V150 M1600,0 L1365,150 M2000,0 L1530,150"/></g>
+  <polygon class="side" points="0,0 580,150 580,720 0,960"/><polygon class="side" points="2400,0 1820,150 1820,720 2400,960"/>
+  <polygon class="panel" points="60,90 190,120 190,790 60,850"/><polygon class="panel" points="250,133 370,160 370,725 250,770"/><polygon class="panel" points="420,170 520,192 520,672 420,708"/>
+  <polygon class="panel" points="2340,90 2210,120 2210,790 2340,850"/><polygon class="panel" points="2150,133 2030,160 2030,725 2150,770"/><polygon class="panel" points="1980,170 1880,192 1880,672 1980,708"/>
+  <rect class="back" x="580" y="150" width="1240" height="570"/>
+  <rect class="win" x="800" y="330" width="170" height="300"/><rect class="win" x="1430" y="330" width="170" height="300"/>
+  <path class="win" d="M1070,640 V330 A130,130 0 0 1 1330,330 V640 Z"/>
+  <polygon class="floor" points="0,960 580,720 1820,720 2400,960 2400,1200 0,1200"/>
+  <g id="rays" style="display:none" opacity=".5"></g>
+</svg>
+<div id="giant"></div><div id="lights"></div><div id="halos"></div><div id="people"></div><div id="arms"></div>
+<div id="table"></div><div id="food"></div><div id="names"></div><div id="front"></div>
+<div id="dots"></div><div id="spot"></div><div id="grain"></div><div id="vig"></div><div id="bubbles"></div>
+<div id="sub"></div><div id="title"></div><div id="tag"></div><div id="ribbon"></div><div id="credits"></div><div id="plaque"></div><div id="frame"></div>
+</div>
+<script>
+const V = 1;
+const LIVE = true;
+const stage = document.getElementById("stage"); stage.className = "v" + V + (LIVE ? " live" : "");
+const $ = id => document.getElementById(id);
+const INK = "#2b1a10", TABLE = 760, G = 1.22;
+const P = (d, fill, extra = "") => `<path d="${d}" fill="${fill}" stroke="${INK}" stroke-width="3" stroke-linejoin="round" ${extra}/>`;
+const mirror = d => d.replace(/([MLQ ])(-?\d+(?:\.\d+)?),/g, (m, c, x) => c + (240 - x) + ",");
+const both = (d, fill, extra) => P(d, fill, extra) + P(mirror(d), fill, extra);
+function shade(hex, k) { const n = parseInt(hex.slice(1), 16); const f = v => Math.max(0, Math.min(255, Math.round(v * k))); return "#" + [n >> 16, n >> 8 & 255, n & 255].map(v => f(v).toString(16).padStart(2, "0")).join(""); }
+
+const BODY = "M18,300 Q16,196 78,182 L162,182 Q224,196 222,300 Z";
+const HAIR_BACK = {
+  curly: c => [[70,70,30],[95,48,30],[125,42,30],[152,50,30],[175,72,30],[186,105,28],[189,140,27],[183,172,26],[58,105,28],[54,140,27],[59,172,26],[70,202,23],[172,202,23]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="${INK}" stroke-width="3"/>`).join(""),
+  wavy: c => P("M52,110 Q40,28 120,30 Q200,28 188,110 Q202,150 186,185 Q198,218 178,244 L62,244 Q42,218 54,185 Q38,150 52,110 Z", c),
+  straight: c => P("M54,108 Q46,28 120,30 Q194,28 186,108 L196,258 L44,258 Z", c),
+  bob: c => P("M54,110 Q46,32 120,32 Q194,32 186,110 Q192,152 178,176 L62,176 Q48,152 54,110 Z", c),
+};
+const HAIR_LOCKS = {
+  wavy: c => both("M56,120 Q40,170 58,206 Q50,236 70,250 L94,250 Q78,214 88,182 Q76,160 80,140 Z", c),
+  straight: c => both("M56,118 Q44,190 50,256 L88,256 Q78,190 80,142 Z", c),
+  curly: c => [[64,196,22],[176,196,22],[74,226,20],[166,226,20]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="${INK}" stroke-width="3"/>`).join(""),
+};
+const HAIR_FRONT = {
+  short: c => P("M60,104 Q52,34 120,32 Q188,34 180,104 Q174,72 150,64 Q110,56 76,72 Q64,82 60,104 Z", c),
+  fade: c => P("M62,100 Q56,38 120,36 Q184,38 178,100 Q170,68 120,64 Q70,68 62,100 Z", c),
+  quiff: c => P("M60,104 Q48,30 108,20 Q172,10 186,58 Q188,84 180,104 Q172,70 140,66 Q100,64 74,76 Q64,84 60,104 Z", c),
+  wavy: c => P("M60,102 Q68,44 120,56 Q172,44 180,102 Q162,68 122,72 Q80,68 60,102 Z", c),
+  straight: c => P("M60,104 Q64,42 120,54 Q176,42 180,104 Q166,66 122,70 Q76,66 60,104 Z", c),
+  bob: c => P("M58,100 Q76,40 150,50 Q184,60 182,100 Q152,60 102,74 Q76,80 58,100 Z", c),
+  curly: c => [[86,60,20],[110,50,21],[135,51,21],[158,62,19]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="${INK}" stroke-width="3"/>`).join(""),
+};
+const MOUTH = {
+  smile: `<path d="M100,138 Q120,158 140,138" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`,
+  smirk: `<path d="M104,144 Q126,152 142,134" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`,
+  grin: P("M98,136 Q120,168 142,136 Z", "#fff"),
+  laugh: P("M96,134 Q120,178 144,134 Z", "#7a1f2b") + `<ellipse cx="120" cy="156" rx="11" ry="6" fill="#f08a9b"/>`,
+  talk: `<ellipse class="talk" cx="120" cy="147" rx="11" ry="8" fill="#7a1f2b" stroke="${INK}" stroke-width="3"/>`,
+  o: `<ellipse cx="120" cy="148" rx="9" ry="12" fill="#7a1f2b" stroke="${INK}" stroke-width="3"/>`,
+};
+function outfit(t, skin) {
+  const c = t.color, d = shade(c, .72);
+  let o = "";
+  if (t.type === "strapless") o = P(BODY, skin) + P("M36,300 L42,238 Q80,222 120,242 Q160,222 198,238 L204,300 Z", c) + [92,104,116,128,140,152].map((x, i) => `<circle cx="${x - 2}" cy="${196 + [0,5,8,8,5,0][i]}" r="3.4" fill="#e9eef5" stroke="${INK}" stroke-width="1.2"/>`).join("");
+  else if (t.type === "tank") o = P(BODY, skin) + P("M30,300 Q30,236 76,206 L90,186 Q120,256 150,186 L164,206 Q210,236 210,300 Z", c);
+  else {
+    o = P(BODY, c);
+    if (t.type === "blazer" || t.type === "tux") o += P("M96,182 L120,246 L144,182 Z", "#fff") + both("M96,182 L80,216 L120,246 Z", d);
+    if (t.type === "tux") o += both("M120,197 L99,186 L99,210 Z", "#111") + `<circle cx="120" cy="197" r="6" fill="#111" stroke="${INK}" stroke-width="2"/>`;
+    if (t.type === "jacket") o += P("M96,182 L102,300 L138,300 L144,182 Z", t.inner) + both("M96,182 L78,206 L100,236 Z", d);
+    if (t.type === "tee") o += P("M98,182 Q120,208 142,182 Z", skin);
+    if (t.type === "sweater" || t.type === "sweat") o += `<path d="M94,185 Q120,207 146,185" fill="none" stroke="${d}" stroke-width="10" stroke-linecap="round"/>`;
+  }
+  return o;
+}
+function arm(c) {
+  const h = c.hold; if (!h) return "";
+  const hx = h.hx || 214, sleeve = (c.top.type === "strapless" || c.top.type === "tank") ? c.skin : c.top.color;
+  const hy = h.hy || 154;
+  const d = `M196,236 Q${hx + 14},${hy + 50} ${hx},${hy + 6}`;
+  const item = h.banner
+    ? `<path d="M${hx},150 V-56" stroke="#6b4a2a" stroke-width="6" stroke-linecap="round"/>` + P(`M${hx},-54 L${hx + 112},-26 L${hx},2 Z`, h.color || "#f57b20") + `<text x="${hx + 38}" y="-18" font-size="22" font-weight="900" font-family="Arial Black,Arial,sans-serif" text-anchor="middle" fill="#fff">${h.banner}</text>`
+    : (h.base ? P(`M${hx - 28},${hy - 26} h56 v11 h-56 Z`, "#7a4a22") : "") + `<text x="${hx}" y="${h.base ? hy - 28 : hy - 18}" font-size="${h.size || 54}" text-anchor="middle">${h.emoji}</text>`;
+  if (h.banner && h.side === "left") {
+    const dl = "M44,236 Q8,204 24,160";
+    return `<g class="arm arm-l"><path d="${dl}" fill="none" stroke="${INK}" stroke-width="36" stroke-linecap="round"/><path d="${dl}" fill="none" stroke="${sleeve}" stroke-width="30" stroke-linecap="round"/><path d="M24,150 V-56" stroke="#6b4a2a" stroke-width="6" stroke-linecap="round"/>` + P("M24,-54 L140,-26 L24,2 Z", h.color || "#f57b20") + `<text x="64" y="-18" font-size="22" font-weight="900" font-family="Arial Black,Arial,sans-serif" text-anchor="middle" fill="#fff">${h.banner}</text><circle cx="24" cy="154" r="17" fill="${c.skin}" stroke="${INK}" stroke-width="3"/></g>`;
+  }
+  const g = `<g class="arm"><path d="${d}" fill="none" stroke="${INK}" stroke-width="36" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${sleeve}" stroke-width="30" stroke-linecap="round"/>${h.banner ? item : ""}<circle cx="${hx}" cy="${hy}" r="17" fill="${c.skin}" stroke="${INK}" stroke-width="3"/>${h.banner ? "" : item}</g>`;
+  return h.side === "left" ? `<g transform="translate(240,0) scale(-1,1)">${g}</g>` : g;
+}
+function person(c) {
+  const hair = c.hair || {}, hc = hair.color || "#222";
+  let o = "";
+  if (!c.hijab && HAIR_BACK[hair.style]) o += HAIR_BACK[hair.style](hc);
+  o += outfit(c.top, c.skin);
+  if (c.dots) o += [[60,236],[96,256],[150,232],[184,258],[120,284],[52,280],[196,290]].map(([x, y]) => `<path d="M${x},${y - 7} l6,7 l-6,7 l-6,-7 Z" fill="${c.dots}"/>`).join("") + `<path d="M86,186 L196,300" stroke="#3a2a22" stroke-width="6"/>`;
+  if (c.lanyard) o += `<path d="M103,188 L120,262 L137,188" fill="none" stroke="#1b1b1b" stroke-width="4"/>` + P("M108,246 h24 v22 h-24 Z", "#f4f1ea");
+  if (c.tee) o += c.tee.lines.map((t, i) => `<text x="${c.tee.x || 120}" y="${(c.tee.lines.length > 1 ? 222 : 232) + i * (c.tee.size + 4)}" font-size="${c.tee.size}" font-weight="900" font-family="Arial Black,Arial,sans-serif" text-anchor="middle" fill="${c.tee.color}">${t}</text>`).join("");
+  if (c.shades) o += `<path d="M112,226 q8,-10 16,0 q-2,16 -8,16 q-6,0 -8,-16 Z" fill="#161616"/>`;
+  if (!c.hijab && !c.noLocks && HAIR_LOCKS[hair.style]) o += HAIR_LOCKS[hair.style](hc);
+  o += P("M104,158 L104,188 Q120,200 136,188 L136,158 Z", shade(c.skin, .9));
+  if (c.hijab) o += P("M44,150 Q22,232 52,300 L188,300 Q218,232 196,150 Q120,214 44,150 Z", c.hijab) + P("M120,26 Q200,26 198,112 Q198,198 120,200 Q42,198 42,112 Q40,26 120,26 Z", c.hijab);
+  else o += `<circle cx="61" cy="114" r="11" fill="${c.skin}" stroke="${INK}" stroke-width="3"/><circle cx="179" cy="114" r="11" fill="${c.skin}" stroke="${INK}" stroke-width="3"/>`;
+  o += c.hijab ? `<ellipse cx="120" cy="116" rx="50" ry="60" fill="${c.skin}" stroke="${INK}" stroke-width="3"/>` + `<path d="M74,92 Q120,44 166,92 Q120,64 74,92 Z" fill="${shade(c.hijab, .6)}" stroke="${INK}" stroke-width="2.5"/>`
+    : `<ellipse cx="120" cy="112" rx="58" ry="66" fill="${c.skin}" stroke="${INK}" stroke-width="3"/>`;
+  const B = "M63,116 Q64,186 120,190 Q176,186 177,116 Q170,142 152,131 Q120,122 88,131 Q70,142 63,116 Z";
+  if (c.beard === "full") o += P(B, hc);
+  if (c.beard === "short") o += P(B, shade(hc, 1.5), 'opacity=".92"');
+  if (c.beard === "stubble") o += `<path d="${B}" fill="${hc}" opacity=".22"/>`;
+  o += `<circle cx="84" cy="136" r="9" fill="#ff7f7f" opacity=".38"/><circle cx="156" cy="136" r="9" fill="#ff7f7f" opacity=".38"/>`;
+  o += `<g class="eyes"><circle cx="98" cy="110" r="11" fill="#fff" stroke="${INK}" stroke-width="2.5"/><circle cx="142" cy="110" r="11" fill="#fff" stroke="${INK}" stroke-width="2.5"/><circle cx="${98 + (c.look || 0)}" cy="111" r="5.5" fill="${INK}"/><circle cx="${142 + (c.look || 0)}" cy="111" r="5.5" fill="${INK}"/></g>`;
+  const by = c.mouth === "o" ? 86 : 91;
+  o += `<path d="M86,${by} Q98,${by - 7} 110,${by} M130,${by} Q142,${by - 7} 154,${by}" fill="none" stroke="${shade(hc, .8)}" stroke-width="4.5" stroke-linecap="round"/>`;
+  o += `<path d="M120,118 q7,13 -3,17" fill="none" stroke="${shade(c.skin, .62)}" stroke-width="3.5" stroke-linecap="round"/>`;
+  o += MOUTH[c.mouth || "smile"];
+  if (!c.hijab && !c.cap && HAIR_FRONT[hair.style]) o += HAIR_FRONT[hair.style](hc);
+  if (c.cap) o += P("M56,94 Q54,24 120,24 Q186,24 184,94 Z", c.cap.color) + P("M46,92 Q120,66 194,92 Q120,116 46,92 Z", shade(c.cap.color, .7)) + (c.cap.text ? `<text x="120" y="68" font-size="15" font-weight="900" font-family="Arial Black,Arial,sans-serif" text-anchor="middle" fill="${c.cap.ink}">${c.cap.text}</text>` : `<circle cx="120" cy="58" r="10" fill="${c.cap.logo}" stroke="${INK}" stroke-width="2"/>`);
+  let over = arm(c);
+  if (c.chat) over += `<g class="chat"><path d="M168,62 L160,84 L186,66 Z" fill="#fff" stroke="${INK}" stroke-width="3"/><ellipse cx="192" cy="42" rx="34" ry="23" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="178" cy="42" r="4.5" fill="${INK}"/><circle cx="192" cy="42" r="4.5" fill="${INK}"/><circle cx="206" cy="42" r="4.5" fill="${INK}"/></g>`;
+  if (c.glasses) o += `<g fill="${c.glasses === "dark" ? "#161616" : "rgba(255,255,255,.3)"}" stroke="${INK}" stroke-width="4.5"><rect x="78" y="96" width="38" height="29" rx="10"/><rect x="124" y="96" width="38" height="29" rx="10"/><path d="M116,108 h8 M78,106 L62,102 M162,106 L178,102" fill="none"/></g>`;
+  return [o, over];
+}
+function hardy() {
+  const g = "#8d9199", spots = [[80,70],[150,64],[166,96],[74,128],[160,150],[98,58],[140,90],[60,226],[96,250],[176,222],[150,262],[198,270],[40,270],[120,226],[84,280]];
+  let o = P(BODY, g) + spots.slice(7).map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${4 + i % 3 * 2}" fill="#3f4248"/>`).join("");
+  o += P("M96,190 L144,190 L140,262 L100,262 Z", "#fff") + `<text x="120" y="240" font-size="30" text-anchor="middle">🦃</text>`;
+  o += `<path d="M92,184 Q120,202 148,184" fill="none" stroke="#e2622b" stroke-width="11" stroke-linecap="round"/>`;
+  o += `<g class="ear">` + P("M70,66 Q26,54 30,134 Q52,146 80,104 Z", "#1d1d1f") + `</g>` + P("M166,60 Q218,24 208,104 Q190,114 164,96 Z", "#1d1d1f");
+  o += P("M60,110 Q60,42 120,42 Q180,42 180,110 Q182,152 150,174 Q120,188 90,174 Q58,152 60,110 Z", g);
+  o += `<path d="M111,45 Q121,92 100,132 Q120,142 140,132 Q119,92 129,45 Z" fill="#f4f4f4"/>`;
+  o += spots.slice(0, 7).map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${4 + i % 3 * 2}" fill="#3f4248"/>`).join("");
+  o += `<ellipse cx="120" cy="152" rx="38" ry="29" fill="#4a4d54" stroke="${INK}" stroke-width="3"/>`;
+  o += `<g class="tongue">` + P("M108,164 Q120,204 132,164 Z", "#f08a9b") + `</g>`;
+  o += `<path d="M120,146 V158 M102,160 Q120,174 138,160" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="120" cy="138" rx="14" ry="10" fill="#111"/>`;
+  o += `<g class="eyes"><circle cx="95" cy="104" r="11" fill="#fff" stroke="${INK}" stroke-width="2.5"/><circle cx="145" cy="104" r="11" fill="#fff" stroke="${INK}" stroke-width="2.5"/><circle cx="91" cy="106" r="6.5" fill="#3a2413"/><circle cx="141" cy="106" r="6.5" fill="#3a2413"/></g>`;
+  o += `<circle cx="66" cy="252" r="19" fill="${g}" stroke="${INK}" stroke-width="3"/><circle cx="174" cy="252" r="19" fill="${g}" stroke="${INK}" stroke-width="3"/><text x="62" y="236" font-size="50" text-anchor="middle">🍴</text><text x="178" y="236" font-size="46" text-anchor="middle">🔪</text>`;
+  return o;
+}
+const CAST = [
+  { name: "Sean", skin: "#f1c9a5", hair: { style: "short", color: "#5a4632" }, cap: { color: "#23262d", logo: "#c9a227" }, beard: "stubble", top: { type: "jacket", color: "#6b6a3a", inner: "#efe6cf" }, mouth: "grin", shades: true, hold: { banner: "WNBA", side: "left" } },
+  { name: "Shifa", skin: "#e8b98f", hijab: "#a9b79a", hair: { color: "#3a2a20" }, top: { type: "plain", color: "#f4f1ea" }, mouth: "talk", look: 4, chat: true },
+  { name: "Kela", skin: "#f3c9a8", hair: { style: "wavy", color: "#7a3b22" }, noLocks: true, top: { type: "tee", color: "#f3ead2" }, tee: { lines: ["ROUND SWAMP", "FARM"], color: "#2f6b3a", size: 14 }, mouth: "o", look: -4, hold: { emoji: "🌽", size: 46 } },
+  { name: "Harbor", skin: "#f6d2b4", hair: { style: "bob", color: "#b0763f" }, top: { type: "sweater", color: "#c2255c" }, dots: "#2f9e5b", mouth: "grin", look: 4, hold: { emoji: "🍗", size: 48 }, s: .86 },
+  { name: "Hardy", dog: true },
+  { name: "Dalia", skin: "#e6b48c", hair: { style: "curly", color: "#3b2416" }, top: { type: "tank", color: "#1c1c1e" }, mouth: "grin", s: 1.06, look: 3, hold: { emoji: "🥂", size: 46, hx: 192 } },
+  { name: "Ahmed", skin: "#e2ad84", hair: { style: "short", color: "#231a14" }, glasses: true, beard: "stubble", top: { type: "blazer", color: "#27365c" }, mouth: "grin", s: 1.06, look: -3, hold: { emoji: "🥂", size: 46, hx: 192, side: "left" } },
+  { name: "Kellie", skin: "#f5d3b8", hair: { style: "straight", color: "#2a1c14" }, top: { type: "strapless", color: "#17171a" }, mouth: "laugh", look: 4, hold: { emoji: "🥧", size: 44, hx: 208, side: "left" } },
+  { name: "Moe", skin: "#d9a47a", hair: { style: "fade", color: "#1c1512" }, beard: "short", top: { type: "tux", color: "#1f2a55" }, mouth: "grin", look: 4, hold: { emoji: "🐎", size: 56, base: true, side: "left", hx: 200, hy: 100 }, s: 1.07 },
+  { name: "Nermene", skin: "#e9b98e", hair: { style: "wavy", color: "#b98a52" }, cap: { color: "#9bcbeb", text: "COLUMBIA", ink: "#12356b" }, top: { type: "jacket", color: "#4a6fa5", inner: "#222" }, mouth: "laugh", hold: { emoji: "🍗", size: 50, hx: 200 } },
+  { name: "Sharif", skin: "#e3ae86", hair: { style: "quiff", color: "#1f1712" }, cap: { color: "#151515", text: "PORSCHE", ink: "#e8c66a" }, beard: "short", top: { type: "tee", color: "#19191b" }, mouth: "talk", look: 4, hold: { emoji: "📱", size: 46, hx: 194 } },
+  { name: "Ramy", skin: "#dba67c", hair: { style: "short", color: "#17120f" }, beard: "full", top: { type: "tee", color: "#1f4fd6" }, tee: { lines: ["MAMDANI"], color: "#ffd23f", size: 18, x: 127 }, mouth: "grin", look: -4, hold: { emoji: "🥧", size: 46 } },
+];
+const svg = (inner, s, left, top, cls, d, t) => `<svg class="char ${cls || ""}" viewBox="0 0 240 300" width="${240 * s}" height="${300 * s}" style="left:${left}px;top:${top}px;--d:${d ?? -1}s;--t:${t ?? 3}s" overflow="visible">${inner}</svg>`;
+CAST.forEach((c, i) => {
+  const x = 190 + i * 183.6, s = (c.s || 1) * G, left = x - 120 * s, topY = TABLE - 262 * s;
+  const d = (-((i * 0.83) % 3)).toFixed(2), t = (2.3 + (i * 0.47) % 1.5).toFixed(2);
+  const [base, over] = c.dog ? [hardy(), ""] : person(c);
+  $("people").insertAdjacentHTML("beforeend", svg(base, s, left, topY, c.dog ? "dog" : "", d, t));
+  if (over) $("arms").insertAdjacentHTML("beforeend", svg(over, s, left, topY, "", d, t));
+  const h = document.createElement("div"); h.className = "halo"; h.style.left = x + "px"; h.style.top = topY + 108 * s + "px"; $("halos").append(h);
+  const n = document.createElement("div"); n.className = "name"; n.textContent = c.name; n.style.left = x + "px"; $("names").append(n);
+});
+const FOOD = [["🥖",120,70],["🫖",290,74],["🥗",470,82],["🧀",650,60],["🥔",835,70],["🍗",1040,80],["🦃",1200,150],["🥧",1370,88],["🍷",1560,78],["🌽",1740,74],["🍇",1930,76],["🍷",2110,78],["🥧",2290,84]];
+for (const [e, x, size] of FOOD) {
+  const d = document.createElement("div"); d.className = "food"; d.textContent = e;
+  d.style.left = x + "px"; d.style.top = (size > 140 ? 852 : 840) + "px"; d.style.fontSize = size + "px"; $("food").append(d);
+}
+const text = (id, html) => { $(id).innerHTML = html; };
+const bubble = (t, left, top, tail, cls) => { const b = document.createElement("div"); b.className = "bubble " + (cls || ""); b.textContent = t; b.style.left = left + "px"; b.style.top = top + "px"; b.style.setProperty("--tail", tail || "40%"); $("bubbles").append(b); };
+
+if (V === 1) text("plaque", "<b>THE LAST SUPPER (UNTIL LEFTOVERS)</b><i>Thanksgiving at Hardy's, 2026. Tempera, gravy and regret on plaster.</i>");
+if (V === 2) {
+  const g = $("rays"); g.style.display = "block";
+  for (let i = 0; i < 24; i++) { const a = i * 15 * Math.PI / 180, b = (i * 15 + 6) * Math.PI / 180;
+    const p = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    p.setAttribute("points", `1200,520 ${1200 + 2600 * Math.cos(a)},${520 + 2600 * Math.sin(a)} ${1200 + 2600 * Math.cos(b)},${520 + 2600 * Math.sin(b)}`);
+    p.setAttribute("fill", "#ffd84d"); g.append(p); }
+  const h = document.createElement("div"); h.className = "halo"; h.style.cssText += "left:1200px;top:776px;width:240px;height:240px"; $("food").prepend(h);
+  text("ribbon", "The Last Supper (Until Leftovers)");
+  text("tag", "Blessed are those who bring dessert.");
+}
+if (V === 3) {
+  text("sub", "THIS THANKSGIVING"); text("title", "THE LAST SUPPER"); text("tag", "…until leftovers.");
+  text("credits", "<b>AHMED &nbsp; DALIA</b><br>SEAN · SHIFA · KELA · HARBOR · KELLIE · MOE · NERMENE · SHARIF · RAMY &nbsp; AND &nbsp;<b>HARDY</b>&nbsp; AS “THE HOST”<br>NOVEMBER 26 · AT HARDY'S · RATED S FOR STUFFED");
+}
+if (V === 4) {
+  bubble("WHO BROUGHT ICE?!", 50, 300, "30%"); bubble("PASS THE GRAVY!", 500, 215, "20%");
+  bubble("WE SAID 4 O'CLOCK!", 1010, 200, "50%"); bubble("IS IT DONE YET?", 1570, 215, "55%"); bubble("I CALL A DRUMSTICK!", 1950, 300, "62%");
+  bubble("DROP SOMETHING. ANYTHING.", 690, 946, "42%", "dog");
+  text("ribbon", "THE LAST SUPPER… UNTIL LEFTOVERS!");
+}
+if (V === 5) {
+  $("giant").innerHTML = `<div id="portrait">${svg(hardy(), 1.02, 68, 14, "dog")}<b>OUR HOST</b></div>`;
+  const L = $("lights");
+  for (let i = 0; i < 30; i++) { const b = document.createElement("div"), x = 40 + i * 80, y = 36 + 50 * Math.sin(i / 29 * Math.PI) - (i % 2 ? 0 : 6);
+    const c = ["#ff5964", "#ffd84d", "#5cc8ff", "#7dff8a", "#ff9bf5"][i % 5];
+    b.className = "bulb"; b.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:20px;height:28px;border-radius:50%;background:${c};box-shadow:0 0 26px 8px ${c};animation-delay:${-(i * .37 % 1.3)}s`; L.append(b); }
+  text("ribbon", "Thanksgiving<br>at Hardy's");
+  text("tag", "The host has been<br>waiting all year.");
+}
+// Inside the page it fits the width. Opened on its own on a phone it fits the height, so you can pan across it.
+const fit = () => {
+  const own = window === window.parent, wide = innerWidth / 2400;
+  const k = own && innerHeight > innerWidth ? Math.max(wide, innerHeight * 0.92 / 1200) : wide;
+  stage.style.transform = `scale(${k})`; stage.style.transformOrigin = "0 0";
+  document.body.style.width = 2400 * k + "px"; document.body.style.height = 1200 * k + "px";
+  document.documentElement.style.overflowY = "hidden";
+  if (k > wide + 0.001 && !fit.done) { fit.done = true; scrollTo((2400 * k - innerWidth) / 2, 0); }
+};
+fit(); addEventListener("resize", fit);
+</script></body></html>

@@ -137,7 +137,10 @@
     width: max(100%, calc(var(--art-h) * 2)); aspect-ratio: 2 / 1; margin: 0 auto; background: #1b120a;
     box-shadow: 0 10px 14px -8px rgba(47, 30, 23, .55);
   }
-  .art-canvas iframe { display: block; width: 100%; height: 100%; border: 0; pointer-events: none; }
+  .art-canvas { position: relative; }
+  .art-canvas img { display: block; width: 100%; height: 100%; }
+  .art-canvas iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
+  .art-canvas iframe:not([src]) { display: none; }
   .swipe-hint { display: flex; align-items: center; justify-content: center; min-height: 36px; font-size: 13px; color: var(--ink-soft); }
   .art:not(.pans) .swipe-hint { display: none; }
   .welcome h1 { margin-top: var(--s-2); font-size: clamp(32px, 9.5vw, 52px); letter-spacing: -.01em; }
@@ -502,7 +505,8 @@
     <figure class="art rise" id="art" style="--i:1">
       <div class="art-scroll" id="art-scroll" tabindex="0" role="group" aria-label="Family portrait. Scroll sideways to see everyone.">
         <div class="art-canvas">
-          <iframe src="montage.html" title="The Last Supper (Until Leftovers): the whole family along one long table, with Hardy the dog in the middle" tabindex="-1"></iframe>
+          <img src="portrait.jpg" width="2000" height="1000" alt="The Last Supper (Until Leftovers): the whole family along one long table, with Hardy the dog in the middle">
+          <iframe data-src="montage.html" title="Animated family portrait" tabindex="-1" aria-hidden="true"></iframe>
         </div>
       </div>
       <figcaption class="swipe-hint">Swipe to meet the whole table</figcaption>
@@ -1322,6 +1326,13 @@ $("down").addEventListener("click", e => {
 $("show-invite").addEventListener("click", () => glide(0));
 addEventListener("resize", centerArt);
 centerArt();
+// Phones and tablets get the portrait as a plain picture. The animated version is a large live
+// scene that can run a phone's browser out of memory when you pinch to zoom, so it only loads
+// on computers (mouse or trackpad).
+if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  const frame = document.querySelector(".art-canvas iframe");
+  frame.src = frame.dataset.src;
+}
 // The pinned "Bring a dish" button stays out of the way while the invitation fills the screen.
 new IntersectionObserver(([e]) => document.documentElement.classList.toggle("at-invite", e.intersectionRatio > 0.35),
   { threshold: [0, 0.35, 1] }).observe($("welcome"));

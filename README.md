@@ -13,9 +13,9 @@ It is a single `index.html` served by GitHub Pages. The shared list lives in a f
 
 Until step 4 is done the page runs in preview mode and saves entries only on the device that typed them.
 
-## Photos and sound
+## Sound and link preview
 
-As someone types a dish, the page offers photo choices from Wikimedia Commons, or they can use their own photo (shrunk to a small square and saved with the entry). `og.png` is the picture shown when the link is shared. The music and sound effects are generated in the page, so there are no audio files.
+The music and sound effects are generated in the page, so there are no audio files. `og.png` is the picture shown when the link is shared.
 
 ## Change the details
 

@@ -138,8 +138,7 @@
     box-shadow: 0 10px 14px -8px rgba(47, 30, 23, .55);
   }
   .art-canvas iframe { display: block; width: 100%; height: 100%; border: 0; pointer-events: none; }
-  .art figcaption { display: flex; justify-content: center; gap: 14px; font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
-  .art figcaption a, .swipe-hint { display: inline-flex; align-items: center; min-height: 36px; color: inherit; text-underline-offset: 3px; }
+  .swipe-hint { display: flex; align-items: center; justify-content: center; min-height: 36px; font-size: 13px; color: var(--ink-soft); }
   .art:not(.pans) .swipe-hint { display: none; }
   .welcome h1 { margin-top: var(--s-2); font-size: clamp(32px, 9.5vw, 52px); letter-spacing: -.01em; }
   .date-line {
@@ -433,7 +432,6 @@
   }
   @media (max-width: 359px) {
     .art-canvas { --rest: 414px; }
-    .art figcaption { font-size: 12px; gap: 10px; }
     .date-line { letter-spacing: .1em; gap: var(--s-2); }
     .date-line::before, .date-line::after { width: 16px; }
     .setting { width: 88px; }
@@ -451,9 +449,11 @@
     .tabs { max-width: 460px; }
   }
   @media (min-width: 720px) {
-    .art-scroll { overflow: visible; }
-    .art-canvas { width: min(100%, 920px, calc((100svh - var(--rest, 400px)) * 2)); min-width: 420px; }
-    .art-canvas { --rest: 378px; }
+/* Wide screens: the painting runs edge to edge. If it would be taller than the space the text
+       leaves, it is trimmed top and bottom around the faces rather than shrunk. */
+    .art { --rest: 336px; --h: min(50vw, calc(100svh - var(--rest))); flex: none; align-self: flex-start; width: 100vw; margin: var(--s-3) 0 var(--s-2) calc(50% - 50vw); }
+    .art-scroll { height: var(--h); margin: 0; padding: 0; overflow: hidden; box-shadow: 0 10px 14px -8px rgba(47, 30, 23, .55); }
+    .art-canvas { position: relative; top: min(0px, calc(var(--h) - 42vw));   /* trim the plaque strip first, then the ceiling */ width: 100%; box-shadow: none; }
     .welcome::before { inset: 16px; }
   }
   @media (min-width: 900px) {
@@ -499,7 +499,7 @@
           <iframe src="montage.html" title="The Last Supper (Until Leftovers): the whole family along one long table, with Hardy the dog in the middle" tabindex="-1"></iframe>
         </div>
       </div>
-      <figcaption><span class="swipe-hint">Swipe to meet the whole table</span><a href="montage.html" target="_blank" rel="noopener" aria-label="See the portrait full size (opens in a new tab)">See it full size</a></figcaption>
+      <figcaption class="swipe-hint">Swipe to meet the whole table</figcaption>
     </figure>
     <h1 id="w-title" class="rise" style="--i:2">Thanksgiving <em>at</em> Hardy's</h1>
     <p class="date-line rise" style="--i:3">Thursday, November 26</p>

@@ -13,6 +13,10 @@ It is a single `index.html` served by GitHub Pages. The shared list lives in a f
 
 Until step 4 is done the page runs in preview mode and saves entries only on the device that typed them.
 
+## Photos and sound
+
+Dish photos are looked up on Wikipedia from the text people type, in their own browser. The music and sound effects are generated in the page, so there are no audio files.
+
 ## Change the details
 
 The title, date line and `PARTY_DATE` are all in `index.html`.

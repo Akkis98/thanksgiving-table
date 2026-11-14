@@ -106,6 +106,16 @@
     box-shadow: 0 5px 10px rgba(58, 36, 19, .25), inset 0 0 0 1px #e3dccf;
     display: grid; place-items: center; font-size: 38px;
   }
+  .photo { width: 86%; height: 86%; border-radius: 50%; object-fit: cover; display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
+  dialog .d-emoji .photo { width: 150px; height: 150px; margin: 0 auto; border: 5px solid #fff; box-shadow: 0 6px 14px rgba(58, 36, 19, .3); }
+  .sound {
+    position: fixed; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 75;
+    display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 999px; cursor: pointer;
+    font: inherit; font-weight: 800; font-size: 14px; color: var(--ink); background: var(--gold);
+    border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+  }
+  .sound:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+  .sound.waiting { animation: wiggle 1.6s ease-in-out infinite; }
   .preview.pop { animation: pop .35s ease; }
   @keyframes pop { 40% { transform: scale(1.25) rotate(-10deg); } }
   .fields { flex: 1; min-width: 0; display: grid; gap: 10px; }
@@ -452,7 +462,7 @@
     <h2>Who's bringing what</h2>
     <div id="guests"></div>
   </section>
-  <footer>Changed your mind? Tap your plate or ornament to take it back.</footer>
+  <footer>Changed your mind? Tap your plate or ornament to take it back.<br>Dish photos are looked up on Wikipedia from what you type.</footer>
 </div>
 
 <dialog id="dialog">
@@ -464,6 +474,7 @@
   <button class="btn ghost" id="d-close" type="button">Close</button>
 </dialog>
 <div class="toast" id="toast" role="status"></div>
+<button class="sound waiting" id="sound" type="button" aria-label="Turn sound on or off">🎵 Tap for music</button>
 
 <script>
 /* =====================================================================
@@ -540,6 +551,201 @@ function treeEmoji(text) {
   return "🎀";
 }
 const emojiFor = d => d.category === TREE ? treeEmoji(d.item) : (guess(d.item)?.emoji ?? CAT[d.category]?.emoji ?? "✨");
+
+/* ---------- dish photos, looked up on Wikipedia from what was typed ---------- */
+const PHOTO_OK = /^https:\/\/(thumb|upload)\.wikimedia\.org\//;
+const photoCache = new Map();
+function findPhoto(text) {
+  const q = text.toLowerCase().replace(/\b\w+'s\b/g, " ")
+    .replace(/\b(my|our|famous|homemade|home made|the|a|an|some|of|best|special|fresh|big|little|lots|tons|two|three|few)\b/g, " ")
+    .replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  if (q.length < 3) return Promise.resolve(null);
+  if (!photoCache.has(q)) {
+    photoCache.set(q, (async () => {
+      try {
+        const res = await fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=1"
+          + "&prop=pageimages&piprop=thumbnail&pithumbsize=240&gsrsearch=" + encodeURIComponent(q));
+        const page = Object.values((await res.json()).query?.pages ?? {})[0];
+        const src = page?.thumbnail?.source;
+        return src && PHOTO_OK.test(src) ? src : null;
+      } catch { return null; }
+    })());
+  }
+  return photoCache.get(q);
+}
+const photoFor = d => d.category !== TREE && d.photo && PHOTO_OK.test(d.photo) ? d.photo : null;
+// Fills a plate with the dish photo, or its emoji when there is no photo.
+function dress(node, d) {
+  const src = photoFor(d);
+  if (!src) { node.textContent = emojiFor(d); return; }
+  const img = new Image();
+  img.className = "photo"; img.alt = ""; img.loading = "lazy"; img.referrerPolicy = "no-referrer";
+  img.onerror = () => { node.textContent = emojiFor(d); };
+  img.src = src;
+  node.replaceChildren(img);
+}
+
+/* ---------- sound: music and effects are synthesized here, no audio files ---------- */
+const sound = (() => {
+  let ctx, master, music, noiseBuf, started = false, muted = false;
+  let song = "cozy", idx = 0, loopStart = 0;
+  try { muted = localStorage.getItem("thanksgiving-muted") === "1"; } catch {}
+  const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+
+  function tone(dest, freq, t, dur, type, vol) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(dest); o.start(t); o.stop(t + dur + 0.05);
+    return o;
+  }
+  function bell(dest, m, t, dur, vol) {
+    tone(dest, hz(m), t, dur, "triangle", vol);
+    tone(dest, hz(m) * 2, t, dur * 0.5, "sine", vol * 0.35);
+    tone(dest, hz(m) * 3.01, t, dur * 0.25, "sine", vol * 0.12);
+  }
+  function noise(dest, t, dur, freq, vol) {
+    const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = noiseBuf; f.type = "highpass"; f.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(dest); src.start(t, Math.random() * 0.5, dur + 0.05);
+  }
+
+  // Each song is a list of [beat, kind, note, length in beats].
+  function build(bpm, bars, melody, chords, backing) {
+    const ev = [];
+    let b = 0;
+    for (const [m, len] of melody) { if (m) ev.push([b, "lead", m, len]); b += len; }
+    chords.forEach((ch, bar) => backing(ev, ch, bar * 4));
+    ev.sort((x, y) => x[0] - y[0]);
+    return { bpm, len: bars * 4, ev };
+  }
+  const C = [60, 67, 72, 67], Am = [57, 64, 69, 64], F = [53, 60, 65, 60], G = [55, 62, 67, 62], D = [50, 57, 62, 57];
+  const SONGS = {
+    // An original cozy music-box loop for dinner.
+    cozy: build(92, 8,
+      [[76, 1], [79, 1], [84, 2], [81, 1], [79, 1], [76, 2], [77, 1], [81, 1], [84, 1], [81, 1], [79, 2], [74, 2],
+       [76, 1], [79, 1], [84, 1], [88, 1], [86, 1], [84, 1], [81, 2], [77, 1], [81, 1], [79, 1], [83, 1], [84, 3], [0, 1]],
+      [C, Am, F, G, C, Am, [F, G], C],
+      (ev, ch, at) => {
+        for (let i = 0; i < 8; i++) {
+          const chord = Array.isArray(ch[0]) ? ch[i < 4 ? 0 : 1] : ch;
+          ev.push([at + i * 0.5, "arp", chord[i % 4], 1]);
+        }
+      }),
+    // Jingle Bells (1857, public domain) for the tree.
+    jingle: build(184, 16,
+      [[76, 1], [76, 1], [76, 2], [76, 1], [76, 1], [76, 2], [76, 1], [79, 1], [72, 1], [74, 1], [76, 4],
+       [77, 1], [77, 1], [77, 1], [77, 1], [77, 1], [76, 1], [76, 1], [76, .5], [76, .5], [76, 1], [74, 1], [74, 1], [76, 1], [74, 2], [79, 2],
+       [76, 1], [76, 1], [76, 2], [76, 1], [76, 1], [76, 2], [76, 1], [79, 1], [72, 1], [74, 1], [76, 4],
+       [77, 1], [77, 1], [77, 1], [77, 1], [77, 1], [76, 1], [76, 1], [76, .5], [76, .5], [79, 1], [79, 1], [77, 1], [74, 1], [72, 4]],
+      [C, C, C, C, F, C, D, G, C, C, C, C, F, C, G, C],
+      (ev, ch, at) => {
+        ev.push([at, "bass", ch[0], 2], [at + 2, "bass", ch[1], 2]);
+        for (let i = 0; i < 4; i++) ev.push([at + i, "shake", 0, 0]);
+      }),
+  };
+  function play(kind, m, len, t, spb) {
+    if (kind === "lead") bell(music, m, t, Math.max(0.9, len * spb * 1.6), 0.2);
+    else if (kind === "arp") tone(music, hz(m), t, 0.7, "sine", 0.07);
+    else if (kind === "bass") tone(music, hz(m), t, len * spb, "triangle", 0.11);
+    else if (kind === "shake") noise(music, t, 0.07, 7000, 0.035);
+  }
+  function pump() {
+    if (!started || muted || ctx.state !== "running") return;
+    const s = SONGS[song], spb = 60 / s.bpm;
+    if (loopStart < ctx.currentTime - s.len * spb) { loopStart = ctx.currentTime + 0.1; idx = 0; }
+    for (;;) {
+      const [b, kind, m, len] = s.ev[idx];
+      const t = loopStart + b * spb;
+      if (t > ctx.currentTime + 0.4) break;
+      if (t >= ctx.currentTime) play(kind, m, len, t, spb);
+      if (++idx >= s.ev.length) { idx = 0; loopStart += s.len * spb; }
+    }
+  }
+  function label() {
+    const b = $("sound");
+    b.classList.toggle("waiting", !started && !muted);
+    b.textContent = muted ? "🔇 Sound off" : started ? "🔊 Sound on" : "🎵 Tap for music";
+  }
+  function start() {
+    if (started) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = 0.9; master.connect(ctx.destination);
+    music = ctx.createGain(); music.gain.value = 0.55; music.connect(master);
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    started = true;
+    ctx.resume();
+    loopStart = ctx.currentTime + 0.15; idx = 0;
+    setInterval(pump, 100);
+    label();
+  }
+  const live = () => started && !muted && ctx.state === "running";
+  const fx = fn => (...args) => { if (live()) try { fn(ctx.currentTime + 0.02, ...args); } catch {} };
+
+  const gobbleAt = t => {
+    const o = ctx.createOscillator(), lfo = ctx.createOscillator(), trem = ctx.createGain(), depth = ctx.createGain(),
+      f = ctx.createBiquadFilter(), g = ctx.createGain();
+    o.type = "sawtooth"; o.frequency.setValueAtTime(560, t); o.frequency.exponentialRampToValueAtTime(280, t + 0.55);
+    lfo.type = "square"; lfo.frequency.setValueAtTime(13, t); lfo.frequency.linearRampToValueAtTime(19, t + 0.55);
+    trem.gain.value = 0.5; depth.gain.value = 0.5; lfo.connect(depth).connect(trem.gain);
+    f.type = "bandpass"; f.frequency.value = 1000; f.Q.value = 2.5;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.3, t + 0.03);
+    g.gain.setValueAtTime(0.3, t + 0.4); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+    o.connect(trem).connect(f).connect(g).connect(master);
+    o.start(t); lfo.start(t); o.stop(t + 0.65); lfo.stop(t + 0.65);
+  };
+  const slide = (t, from, to, dur) => {
+    const o = tone(master, from, t, dur, "sine", 0.22);
+    o.frequency.exponentialRampToValueAtTime(to, t + dur * 0.9);
+  };
+
+  return {
+    start, label,
+    isMuted: () => muted,
+    toggle() {
+      if (!started && !muted) { start(); return; }
+      muted = !muted;
+      try { localStorage.setItem("thanksgiving-muted", muted ? "1" : "0"); } catch {}
+      if (!muted && !started) start();
+      else if (started) { if (muted) ctx.suspend(); else ctx.resume(); }
+      label();
+    },
+    pause(hidden) { if (started && !muted) { if (hidden) ctx.suspend(); else ctx.resume(); } },
+    setSong(name) {
+      if (name === song) return;
+      song = name; idx = 0;
+      if (!started) return;
+      const t = ctx.currentTime;
+      music.gain.cancelScheduledValues(t);
+      music.gain.setTargetAtTime(0.0001, t, 0.06);
+      music.gain.setTargetAtTime(0.55, t + 0.45, 0.1);
+      loopStart = t + 0.55;
+    },
+    // A dish landing: plate clink, a little ta-da, then the turkey weighs in.
+    plate: fx(t => {
+      noise(master, t, 0.05, 3000, 0.25);
+      bell(master, 84, t, 0.7, 0.3); bell(master, 88, t + 0.1, 0.7, 0.3); bell(master, 91, t + 0.2, 0.7, 0.3); bell(master, 96, t + 0.32, 1.4, 0.34);
+      gobbleAt(t + 0.75);
+    }),
+    // An ornament going up: sleigh bells and a glittery run.
+    ornament: fx(t => {
+      for (let i = 0; i < 7; i++) noise(master, t + i * 0.075, 0.06, 6500, 0.16);
+      [96, 100, 103, 108].forEach((m, i) => bell(master, m, t + 0.1 + i * 0.085, 1.1, 0.2));
+    }),
+    remove: fx(t => { slide(t, 330, 300, 0.28); slide(t + 0.3, 262, 196, 0.6); }),
+    gobble: fx(t => gobbleAt(t)),
+    flee: fx(t => { slide(t, 500, 1700, 0.35); slide(t + 0.35, 1700, 200, 0.8); slide(t + 2.2, 250, 700, 0.3); }),
+    tick: fx(t => { tone(master, 1100, t, 0.06, "sine", 0.12); }),
+    oops: fx(t => { tone(master, 180, t, 0.22, "square", 0.1); }),
+  };
+})();
 
 /* ---------- storage: Supabase when configured, this device otherwise ---------- */
 const $ = id => document.getElementById(id);
@@ -642,7 +848,9 @@ function renderTable() {
       b.type = "button";
       b.dataset.id = d.id;
       b.setAttribute("aria-label", `${d.item}, from ${d.name}`);
-      b.append(el("div", "plate", emojiFor(d)));
+      const plate = el("div", "plate");
+      dress(plate, d);
+      b.append(plate);
       const card = el("div", "place-card");
       card.style.setProperty("--tilt", ((hash(d.id) % 90) / 10 - 4.5).toFixed(1) + "deg");
       card.append(el("div", "what", d.item), el("div", "who", d.name));
@@ -891,7 +1099,7 @@ for (const cat of CATS) {
   const l = el("label", "chip");
   const i = el("input");
   i.type = "radio"; i.name = "cat"; i.value = cat.id;
-  i.addEventListener("change", () => { catTouched = true; updatePreview(); });
+  i.addEventListener("change", () => { catTouched = true; updatePreview(); sound.tick(); });
   l.append(i, el("span", null, `${cat.emoji} ${cat.label}`));
   chips.append(l);
 }
@@ -902,13 +1110,36 @@ function pickCat(id, byUser) {
   if (byUser) catTouched = true;
   updatePreview();
 }
-let lastEmoji = "🍽️";
+let lastShown = "🍽️";
+let previewPhoto = { text: "", url: null }, photoTimer;
+const wantsPhoto = () => currentCat() !== "supplies" && guess($("item").value)?.cat !== "supplies";
 function updatePreview() {
   const emoji = guess($("item").value)?.emoji ?? CAT[currentCat()]?.emoji ?? "🍽️";
-  if (emoji === lastEmoji) return;
+  const photo = wantsPhoto() ? previewPhoto.url : null;
+  const key = photo ?? emoji;
+  if (key === lastShown) return;
+  lastShown = key;
   const p = $("preview");
-  p.textContent = emoji; lastEmoji = emoji;
+  if (photo) {
+    const img = new Image();
+    img.className = "photo"; img.alt = ""; img.referrerPolicy = "no-referrer";
+    img.onerror = () => { p.textContent = emoji; };
+    img.src = photo;
+    p.replaceChildren(img);
+  } else p.textContent = emoji;
   p.classList.remove("pop"); void p.offsetWidth; p.classList.add("pop");
+}
+function queuePhoto() {
+  clearTimeout(photoTimer);
+  const text = $("item").value.trim();
+  if (previewPhoto.text !== text) previewPhoto = { text: "", url: null };
+  if (text.length < 3) return;
+  photoTimer = setTimeout(async () => {
+    const url = await findPhoto(text);
+    if ($("item").value.trim() !== text) return;
+    previewPhoto = { text, url };
+    updatePreview();
+  }, 600);
 }
 const norm = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
 function updateHint() {
@@ -927,6 +1158,7 @@ function updateHint() {
 $("item").addEventListener("input", () => {
   const g = guess($("item").value);
   if (g && !catTouched) pickCat(g.cat, false);
+  queuePhoto();
   updatePreview(); updateHint();
 });
 $("name").addEventListener("input", updateHint);
@@ -948,6 +1180,7 @@ async function save(entry, btn, idleLabel, busyLabel) {
     return row;
   } catch (err) {
     toast("That didn't save. Try once more.");
+    sound.oops();
     return null;
   } finally {
     btn.disabled = false; btn.textContent = idleLabel;
@@ -960,8 +1193,17 @@ $("form").addEventListener("submit", async e => {
   if (!item) { toast("What are you bringing?"); $("item").focus(); return; }
   if (!name) { toast("Add your name so we know who to thank."); $("name").focus(); return; }
   const category = currentCat() ?? guess(item)?.cat ?? "other";
-  const row = await save({ name, item, category, note: note || null }, $("submit"), "Put it on the table", "Setting the table…");
+  const btn = $("submit");
+  btn.disabled = true; btn.textContent = "Setting the table…";
+  let photo = null;
+  if (category !== "supplies") {
+    photo = previewPhoto.text === item ? previewPhoto.url
+      : await Promise.race([findPhoto(item), new Promise(r => setTimeout(() => r(null), 2500))]);
+  }
+  const row = await save({ name, item, category, note: note || null, photo }, btn, "Put it on the table", "Setting the table…");
   if (!row) return;
+  sound.plate();
+  clearTimeout(photoTimer); previewPhoto = { text: "", url: null };
   $("item").value = ""; $("note").value = ""; $("hint").textContent = "";
   catTouched = false;
   chips.querySelectorAll("input").forEach(i => { i.checked = false; });
@@ -982,6 +1224,7 @@ $("tree-form").addEventListener("submit", async e => {
   const hadStar = treeItems().some(d => IS_STAR.test(d.item));
   const row = await save({ name, item, category: TREE, note: null }, $("tsubmit"), "Hang it on the tree", "Climbing the ladder…");
   if (!row) return;
+  sound.ornament();
   $("titem").value = "";
   burst(pick(["✨", "❄️", emojiFor(row)]), $("tsubmit"));
   toast(!hadLights && IS_LIGHTS.test(row.item) ? "And then there was light!"
@@ -996,7 +1239,7 @@ let openRow = null, armed = false;
 const removeLabel = () => openRow?.category === TREE ? "Take it off the tree" : "Take it off the table";
 function openDish(d) {
   openRow = d; armed = false;
-  $("d-emoji").textContent = emojiFor(d);
+  dress($("d-emoji"), d);
   $("d-item").textContent = d.item;
   $("d-who").textContent = `from ${d.name}`;
   $("d-note").textContent = d.note ?? (d.category === TREE ? "For the tree" : "");
@@ -1014,6 +1257,7 @@ $("d-remove").addEventListener("click", async () => {
     dishes = dishes.filter(d => d.id !== row.id);
     render();
     toast(row.category === TREE ? "Off the tree." : "Off the table.");
+    sound.remove();
   } catch { toast("Couldn't remove it. Try once more."); }
 });
 
@@ -1057,8 +1301,10 @@ $("turkey").addEventListener("click", () => {
     $("bubble").textContent = "That's it. I'm leaving.";
     t.classList.remove("wobble", "flee"); void t.offsetWidth; t.classList.add("flee");
     setTimeout(() => { $("bubble").textContent = "…the door was locked. Fine. I'm back."; }, 2300);
+    sound.flee();
     return;
   }
+  sound.gobble();
   say(turkeyLine());
 });
 
@@ -1108,6 +1354,22 @@ function toast(msg) {
     days === 0 ? "It's today. Come hungry." :
     "Hope you saved room for leftovers.";
 })();
+
+/* ---------- sound wiring ---------- */
+sound.label();
+$("sound").addEventListener("click", () => sound.toggle());
+// Browsers only allow sound after a tap, so the music starts on the first one.
+const firstTap = e => {
+  if (e.target.closest?.("#sound")) return;
+  removeEventListener("pointerdown", firstTap); removeEventListener("keydown", firstTap);
+  if (!sound.isMuted()) sound.start();
+};
+addEventListener("pointerdown", firstTap);
+addEventListener("keydown", firstTap);
+document.addEventListener("visibilitychange", () => sound.pause(document.hidden));
+// Dinner music up top, Jingle Bells once the tree is on screen.
+new IntersectionObserver(([entry]) => sound.setSong(entry.isIntersecting ? "jingle" : "cozy"),
+  { rootMargin: "-45% 0px -45% 0px" }).observe($("tree"));
 
 if (!configured) {
   $("banner").hidden = false;

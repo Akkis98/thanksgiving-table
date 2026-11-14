@@ -6,7 +6,7 @@ It is a single `index.html` served by GitHub Pages. The shared list lives in a f
 
 ## How the page is laid out
 
-- **The invitation.** First-time guests land on the family portrait (`montage.html`) with one button, "Enter the feast". Returning guests skip it; the Invitation button in the header brings it back.
+- **The invitation.** The top of the page is the family portrait (`montage.html`), filling the screen, with an arrow down to the sign-up. The Invitation button in the header scrolls back up to it.
 - **The Feast** and **The Tree.** Two tabs for the two halves of the evening. Each has a scene (the table, the tree), a list by guest, and one button to add something. Tapping any entry lets you edit or remove it.
 - **Design tokens.** Colors, fonts, spacing, radii and shadows are defined once at the top of the `<style>` block in `index.html`. The tree tab only swaps the accent color.
 
@@ -23,7 +23,7 @@ Until step 4 is done the page runs in preview mode and saves entries only on the
 
 ## Sound and link preview
 
-The music and sound effects are generated in the page, so there are no audio files. Nothing plays until a guest presses Music. `og.png` is the picture shown when the link is shared.
+The music and sound effects are generated in the page, so there are no audio files. Music is on by default and starts as soon as the browser allows it (usually the guest's first tap); the Music button turns it off, and that choice is remembered. `og.png` is the picture shown when the link is shared.
 
 ## Change the details
 

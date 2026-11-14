@@ -15,7 +15,7 @@ Until step 4 is done the page runs in preview mode and saves entries only on the
 
 ## Photos and sound
 
-Dish photos are looked up on Wikipedia from the text people type, in their own browser. The music and sound effects are generated in the page, so there are no audio files.
+As someone types a dish, the page offers photo choices from Wikimedia Commons, or they can use their own photo (shrunk to a small square and saved with the entry). `og.png` is the picture shown when the link is shared. The music and sound effects are generated in the page, so there are no audio files.
 
 ## Change the details
 

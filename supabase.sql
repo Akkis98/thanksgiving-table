@@ -6,7 +6,9 @@ create table public.dishes (
   item text not null check (char_length(item) between 1 and 80),
   category text not null check (category in ('mains', 'sides', 'desserts', 'drinks', 'supplies', 'other', 'tree')),
   note text check (note is null or char_length(note) <= 140),
-  photo text check (photo is null or (char_length(photo) <= 600 and photo ~ '^https://(thumb|upload)\.wikimedia\.org/')),
+  photo text check (photo is null
+    or (char_length(photo) <= 600 and photo ~ '^https://(thumb|upload)\.wikimedia\.org/')
+    or (char_length(photo) <= 80000 and photo like 'data:image/jpeg;base64,%')),
   created_at timestamptz not null default now()
 );
 

@@ -5,8 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Thanksgiving at Hardy's</title>
-<meta property="og:title" content="Thanksgiving at Hardy's">
-<meta property="og:description" content="Tell us what you're bringing for dinner, and for the Christmas tree we're dressing after.">
+<meta name="description" content="Claim your dish before we end up with five pumpkin pies and no plates. Then help dress the tree. The turkey has opinions.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://akkis98.github.io/thanksgiving-table/">
+<meta property="og:site_name" content="Thanksgiving at Hardy's">
+<meta property="og:title" content="You're invited: Thanksgiving at Hardy's 🦃 What are you bringing?">
+<meta property="og:description" content="Claim your dish before we end up with five pumpkin pies and no plates. Then help dress the tree. The turkey has opinions.">
+<meta property="og:image" content="https://akkis98.github.io/thanksgiving-table/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Thanksgiving at Hardy's, Thursday, November 26. What are you bringing?">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#f0932b">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦃</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -116,6 +125,17 @@
   }
   .sound:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
   .sound.waiting { animation: wiggle 1.6s ease-in-out infinite; }
+  .picks { margin-top: 14px; }
+  .picks[hidden] { display: none; }
+  .picks-lbl { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px; }
+  .picks-row { display: flex; gap: 10px; overflow-x: auto; padding: 6px 4px 10px; -webkit-overflow-scrolling: touch; }
+  .pick {
+    flex: none; width: 62px; height: 62px; border-radius: 50%; border: 2px solid var(--line); background: #fff; padding: 0;
+    font-size: 26px; cursor: pointer; overflow: hidden; display: grid; place-items: center; transition: transform .15s;
+  }
+  .pick img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pick.on { border-color: var(--cranberry); box-shadow: 0 0 0 3px var(--cranberry); transform: scale(1.08); }
+  .pick.own { width: auto; border-radius: 999px; padding: 0 14px; font: inherit; font-weight: 800; font-size: 14px; gap: 6px; display: flex; align-items: center; background: var(--gold); border-color: var(--ink); color: var(--ink); }
   .preview.pop { animation: pop .35s ease; }
   @keyframes pop { 40% { transform: scale(1.25) rotate(-10deg); } }
   .fields { flex: 1; min-width: 0; display: grid; gap: 10px; }
@@ -397,6 +417,11 @@
         <input type="text" id="name" class="name-input" maxlength="40" placeholder="Your name" aria-label="Your name" autocomplete="given-name" enterkeyhint="next">
       </div>
     </div>
+    <div class="picks" id="picks" hidden>
+      <div class="picks-lbl" id="picks-lbl">Pick the photo that looks like yours</div>
+      <div class="picks-row" id="picks-row"></div>
+    </div>
+    <input type="file" id="own" accept="image/*" hidden>
     <p class="hint" id="hint" role="status"></p>
 
     <span class="lbl" id="cat-lbl">It counts as</span>
@@ -462,7 +487,7 @@
     <h2>Who's bringing what</h2>
     <div id="guests"></div>
   </section>
-  <footer>Changed your mind? Tap your plate or ornament to take it back.<br>Dish photos are looked up on Wikipedia from what you type.</footer>
+  <footer>Changed your mind? Tap your plate or ornament to take it back.<br>Photo choices come from Wikimedia Commons, based on what you type.</footer>
 </div>
 
 <dialog id="dialog">
@@ -552,26 +577,54 @@ function treeEmoji(text) {
 }
 const emojiFor = d => d.category === TREE ? treeEmoji(d.item) : (guess(d.item)?.emoji ?? CAT[d.category]?.emoji ?? "✨");
 
-/* ---------- dish photos, looked up on Wikipedia from what was typed ---------- */
-const PHOTO_OK = /^https:\/\/(thumb|upload)\.wikimedia\.org\//;
+/* ---------- dish photos: choices from Wikimedia Commons, or the guest's own ---------- */
+const PHOTO_OK = /^(https:\/\/(thumb|upload)\.wikimedia\.org\/|data:image\/jpeg;base64,)/;
+const NOT_FOOD = /store|company|shop|logo|flower|plant|map|diagram|book|history|label|sign|advert|poster|canned|factory|field|seed|drawing|painting|illustration|icon|relatives|museum|building/;
 const photoCache = new Map();
-function findPhoto(text) {
-  const q = text.toLowerCase().replace(/\b\w+'s\b/g, " ")
-    .replace(/\b(my|our|famous|homemade|home made|the|a|an|some|of|best|special|fresh|big|little|lots|tons|two|three|few)\b/g, " ")
+function findPhotos(text) {
+  const clean = text.toLowerCase().replace(/\b\w+'s\b/g, " ")
+    .replace(/\b(my|our|famous|homemade|home made|the|a|an|and|with|some|of|best|special|fresh|big|little|lots|tons|two|three|few)\b/g, " ")
     .replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
-  if (q.length < 3) return Promise.resolve(null);
-  if (!photoCache.has(q)) {
-    photoCache.set(q, (async () => {
+  if (clean.length < 3) return Promise.resolve({ options: [], best: null });
+  if (!photoCache.has(clean)) {
+    photoCache.set(clean, (async () => {
       try {
-        const res = await fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=1"
-          + "&prop=pageimages&piprop=thumbnail&pithumbsize=240&gsrsearch=" + encodeURIComponent(q));
-        const page = Object.values((await res.json()).query?.pages ?? {})[0];
-        const src = page?.thumbnail?.source;
-        return src && PHOTO_OK.test(src) ? src : null;
-      } catch { return null; }
+        const words = clean.split(" ").filter(w => w.length >= 3).map(w => w.replace(/(es|s)$/, ""));
+        const res = await fetch("https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=14"
+          + "&prop=imageinfo&iiprop=url&iiurlwidth=240&gsrsearch=" + encodeURIComponent(clean + " filetype:bitmap"));
+        const pages = Object.values((await res.json()).query?.pages ?? {});
+        const seen = new Set();
+        const scored = pages.map(p => {
+          const url = p.imageinfo?.[0]?.thumburl, title = (p.title ?? "").toLowerCase();
+          if (!url || !PHOTO_OK.test(url) || seen.has(url)) return null;
+          seen.add(url);
+          const hit = words.filter(w => title.includes(w)).length;
+          const bad = NOT_FOOD.test(title);
+          return { url, sure: !bad && words.length > 0 && hit === words.length, score: hit * 2 - (bad ? 4 : 0) - (p.index ?? 0) * 0.05 };
+        }).filter(Boolean).sort((x, y) => y.score - x.score).filter(x => x.score > -2).slice(0, 7);
+        return { options: scored.map(x => x.url), best: scored[0]?.sure ? scored[0].url : null };
+      } catch { return { options: [], best: null }; }
     })());
   }
-  return photoCache.get(q);
+  return photoCache.get(clean);
+}
+// Shrinks a guest's own photo to a small square so it can be saved with the dish.
+function shrink(file) {
+  return new Promise((resolve, reject) => {
+    const src = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const size = 256, side = Math.min(img.naturalWidth, img.naturalHeight);
+      const c = document.createElement("canvas");
+      c.width = c.height = size;
+      c.getContext("2d").drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+      URL.revokeObjectURL(src);
+      let out = c.toDataURL("image/jpeg", 0.74);
+      if (out.length > 70000) out = c.toDataURL("image/jpeg", 0.5);
+      out.length > 78000 ? reject(new Error("too big")) : resolve(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(src); reject(new Error("unreadable")); };
+    img.src = src;
+  });
 }
 const photoFor = d => d.category !== TREE && d.photo && PHOTO_OK.test(d.photo) ? d.photo : null;
 // Fills a plate with the dish photo, or its emoji when there is no photo.
@@ -1111,20 +1164,51 @@ function pickCat(id, byUser) {
   updatePreview();
 }
 let lastShown = "🍽️";
-let previewPhoto = { text: "", url: null }, photoTimer;
+const blankPhoto = () => ({ text: "", options: [], url: null, own: null, picked: false, loading: false });
+let photo = blankPhoto(), photoTimer;
 const wantsPhoto = () => currentCat() !== "supplies" && guess($("item").value)?.cat !== "supplies";
+function thumb(url) {
+  const img = new Image();
+  img.alt = ""; img.referrerPolicy = "no-referrer"; img.src = url;
+  return img;
+}
+function choose(url) {
+  photo.url = url; photo.picked = true;
+  sound.tick(); updatePreview();
+}
+function renderPicks() {
+  const typed = $("item").value.trim().length >= 3;
+  const show = wantsPhoto() && (typed || photo.own);
+  $("picks").hidden = !show;
+  if (!show) return;
+  $("picks-lbl").textContent = photo.loading ? "Looking for photos…"
+    : photo.options.length ? "Pick the photo that looks like yours" : "Add a photo of your dish";
+  const row = $("picks-row");
+  row.replaceChildren();
+  const tile = (content, cls, label, onClick) => {
+    const b = el("button", "pick " + cls);
+    b.type = "button"; b.setAttribute("aria-label", label);
+    if (typeof content === "string") b.textContent = content; else b.append(content);
+    b.addEventListener("click", onClick);
+    row.append(b);
+  };
+  tile("📷 Use my own", "own", "Use my own photo", () => $("own").click());
+  if (photo.own) tile(thumb(photo.own), photo.url === photo.own ? "on" : "", "My photo", () => choose(photo.own));
+  for (const u of photo.options) tile(thumb(u), photo.url === u ? "on" : "", "Photo choice", () => choose(u));
+  tile("🚫", photo.url === null ? "on" : "", "No photo", () => choose(null));
+}
 function updatePreview() {
+  renderPicks();
   const emoji = guess($("item").value)?.emoji ?? CAT[currentCat()]?.emoji ?? "🍽️";
-  const photo = wantsPhoto() ? previewPhoto.url : null;
-  const key = photo ?? emoji;
+  const shown = wantsPhoto() ? photo.url : null;
+  const key = shown ?? emoji;
   if (key === lastShown) return;
   lastShown = key;
   const p = $("preview");
-  if (photo) {
-    const img = new Image();
-    img.className = "photo"; img.alt = ""; img.referrerPolicy = "no-referrer";
+  if (shown) {
+    const img = thumb(shown);
+    img.className = "photo";
     img.onerror = () => { p.textContent = emoji; };
-    img.src = photo;
     p.replaceChildren(img);
   } else p.textContent = emoji;
   p.classList.remove("pop"); void p.offsetWidth; p.classList.add("pop");
@@ -1132,15 +1216,30 @@ function updatePreview() {
 function queuePhoto() {
   clearTimeout(photoTimer);
   const text = $("item").value.trim();
-  if (previewPhoto.text !== text) previewPhoto = { text: "", url: null };
-  if (text.length < 3) return;
+  if (photo.text !== text) {
+    photo.text = ""; photo.options = [];
+    if (!(photo.own && photo.url === photo.own)) { photo.url = null; photo.picked = false; }
+  }
+  photo.loading = text.length >= 3;
+  if (!photo.loading) return;
   photoTimer = setTimeout(async () => {
-    const url = await findPhoto(text);
+    const found = await findPhotos(text);
     if ($("item").value.trim() !== text) return;
-    previewPhoto = { text, url };
+    photo.text = text; photo.options = found.options; photo.loading = false;
+    if (!photo.picked) photo.url = found.best;
     updatePreview();
   }, 600);
 }
+$("own").addEventListener("change", async e => {
+  const file = e.target.files?.[0];
+  e.target.value = "";
+  if (!file) return;
+  try {
+    const url = await shrink(file);
+    photo.own = url; photo.url = url; photo.picked = true;
+    updatePreview();
+  } catch { toast("Couldn't use that photo. Try another one."); }
+});
 const norm = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
 function updateHint() {
   const typed = norm($("item").value);
@@ -1195,15 +1294,15 @@ $("form").addEventListener("submit", async e => {
   const category = currentCat() ?? guess(item)?.cat ?? "other";
   const btn = $("submit");
   btn.disabled = true; btn.textContent = "Setting the table…";
-  let photo = null;
+  let chosen = null;
   if (category !== "supplies") {
-    photo = previewPhoto.text === item ? previewPhoto.url
-      : await Promise.race([findPhoto(item), new Promise(r => setTimeout(() => r(null), 2500))]);
+    chosen = photo.picked || photo.text === item ? photo.url
+      : (await Promise.race([findPhotos(item), new Promise(r => setTimeout(() => r({ best: null }), 2500))])).best;
   }
-  const row = await save({ name, item, category, note: note || null, photo }, btn, "Put it on the table", "Setting the table…");
+  const row = await save({ name, item, category, note: note || null, photo: chosen }, btn, "Put it on the table", "Setting the table…");
   if (!row) return;
   sound.plate();
-  clearTimeout(photoTimer); previewPhoto = { text: "", url: null };
+  clearTimeout(photoTimer); photo = blankPhoto();
   $("item").value = ""; $("note").value = ""; $("hint").textContent = "";
   catTouched = false;
   chips.querySelectorAll("input").forEach(i => { i.checked = false; });

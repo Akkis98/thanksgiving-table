@@ -120,7 +120,7 @@
      ===================================================================== */
   .welcome {
     position: relative; min-height: 100vh; min-height: 100svh; display: grid; place-items: center;
-    padding: 26px var(--s-4) calc(22px + env(safe-area-inset-bottom)); text-align: center; overflow: hidden;
+    padding: 26px var(--s-4) calc(22px + env(safe-area-inset-bottom)); text-align: center; overflow: hidden; overflow: clip;
   }
   .welcome::before {
     content: ""; position: absolute; inset: 10px; border: 3px double var(--line-strong); border-radius: 6px; pointer-events: none;
@@ -450,12 +450,17 @@
     .tabs { max-width: 460px; }
   }
   @media (min-width: 720px) {
-/* Wide screens: the painting runs edge to edge. If it would be taller than the space the text
-       leaves, it is trimmed top and bottom around the faces rather than shrunk. */
-    .art { --rest: 366px; --h: min(50vw, calc(100svh - var(--rest))); flex: none; align-self: flex-start; width: 100vw; margin: var(--s-3) 0 var(--s-2) calc(50% - 50vw); }
-    .art-scroll { height: var(--h); margin: 0; padding: 0; overflow: hidden; box-shadow: 0 10px 14px -8px rgba(47, 30, 23, .55); }
-    .art-canvas { position: relative; top: min(0px, calc(var(--h) - 42vw));   /* trim the plaque strip first, then the ceiling */ width: 100%; box-shadow: none; }
+/* Wide screens: the whole painting, edge to edge, never trimmed. When that leaves the text
+       below the first screen, the arrow rides along the bottom of the window to say "keep going". */
+    .art { flex: none; align-self: flex-start; width: var(--vw, 100vw); margin: var(--s-3) 0 var(--s-2) calc(50% - var(--vw, 100vw) / 2); }
+    .art-scroll { margin: 0; padding: 0; overflow: hidden; box-shadow: 0 10px 14px -8px rgba(47, 30, 23, .55); }
+    .art-canvas { width: 100%; box-shadow: none; }
     .welcome::before { inset: 16px; }
+  }
+  @media (min-width: 720px) and (min-aspect-ratio: 5/4) {
+    /* Landscape screens, where the painting can fill the window: pin the arrow to the corner. */
+    .down { position: sticky; bottom: 20px; align-self: flex-end; margin-top: calc(var(--s-2) * -1); padding: 0; z-index: 2; }
+    .down-arrow { box-shadow: 0 0 0 4px var(--parchment), 0 2px 0 4px var(--cranberry-deep), var(--shadow-2); }
   }
   @media (min-width: 900px) {
     .app { padding-bottom: var(--s-7); }
@@ -1302,6 +1307,7 @@ addEventListener("hashchange", () => {
 
 /* ---------- the invitation: the top of the page ---------- */
 function centerArt() {
+  document.documentElement.style.setProperty("--vw", document.documentElement.clientWidth + "px");   // page width without the scrollbar
   const s = $("art-scroll");
   const pans = s.scrollWidth > s.clientWidth + 60;
   $("art").classList.toggle("pans", pans);
